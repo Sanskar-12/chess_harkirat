@@ -18,13 +18,14 @@ export class Game {
                 color: "black",
             },
         }));
+        this.moveCount = 0;
     }
     makeMove(socket, move) {
         //validation for making a move
-        if (this.board.moves.length % 2 === 0 && socket !== this.player1) {
+        if (this.moveCount % 2 === 0 && socket !== this.player1) {
             return;
         }
-        if (this.board.moves.length % 2 === 1 && socket !== this.player2) {
+        if (this.moveCount % 2 === 1 && socket !== this.player2) {
             return;
         }
         try {
@@ -35,13 +36,13 @@ export class Game {
             return;
         }
         if (this.board.isGameOver()) {
-            this.player1.emit(JSON.stringify({
+            this.player1.send(JSON.stringify({
                 type: GAME_OVER,
                 payload: {
                     winner: this.board.turn() === "w" ? "black" : "white",
                 },
             }));
-            this.player2.emit(JSON.stringify({
+            this.player2.send(JSON.stringify({
                 type: GAME_OVER,
                 payload: {
                     winner: this.board.turn() === "w" ? "black" : "white",
@@ -49,17 +50,18 @@ export class Game {
             }));
             return;
         }
-        if (this.board.moves.length % 2 === 0) {
-            this.player2.emit(JSON.stringify({
+        if (this.moveCount % 2 === 0) {
+            this.player2.send(JSON.stringify({
                 type: MOVE,
                 payload: move,
             }));
         }
         else {
-            this.player1.emit(JSON.stringify({
+            this.player1.send(JSON.stringify({
                 type: MOVE,
                 payload: move,
             }));
         }
+        this.moveCount++;
     }
 }
